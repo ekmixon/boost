@@ -66,22 +66,29 @@ class check_library():
     
     def check_organization_include(self):
         if os.path.isdir(os.path.join(self.library_dir,'include','boost',self.library_name)):
-            self.warn_file_exists(os.path.join(self.library_dir,'include','boost'), ['*.h*'],
+            self.warn_file_exists(
+                os.path.join(self.library_dir, 'include', 'boost'),
+                ['*.h*'],
                 '''
                 Found extra files in [project-root]/include/boost directory.
                 ''',
                 'org-inc-extra',
-                negate = True,
-                globs_to_exclude = ['%s.h*'%(self.library_name)])
+                negate=True,
+                globs_to_exclude=[f'{self.library_name}.h*'],
+            )
+
         else:
-            self.warn_file_exists(os.path.join(self.library_dir,'include','boost'), ['%s.h*'%(self.library_name)],
+            self.warn_file_exists(
+                os.path.join(self.library_dir, 'include', 'boost'),
+                [f'{self.library_name}.h*'],
                 '''
                 Did not find [project-root]/include/boost/[library].h* file.
                 
                 A single header for the library is suggested at [project-root]/include/boost/[library].h*
                 if the library does not have a header directory at [project-root]/include/boost/[library].
                 ''',
-                'org-inc-one')
+                'org-inc-one',
+            )
     
     def check_organization_meta(self):
         parent_dir = os.path.dirname(self.library_dir)
@@ -89,7 +96,7 @@ class check_library():
         # parent library's meta/libraries.json. Otherwise it's a regular library
         # and structure.
         if not self.test_dir_exists(os.path.join(self.library_dir,'meta')) \
-            and self.test_file_exists(os.path.join(parent_dir,'meta'),['libraries.json']):
+                and self.test_file_exists(os.path.join(parent_dir,'meta'),['libraries.json']):
             if self.get_library_meta():
                 return
             self.assert_file_exists(os.path.join(self.library_dir, 'meta'), ['libraries.json'],
@@ -206,24 +213,18 @@ class check_library():
 
     def error(self, reason, message, key):
         self.error_count += 1
-        print("%s: error: %s; %s <<%s>>"%(
-            self.library,
-            self.clean_message(reason),
-            self.clean_message(message),
-            key,
-            ))
+        print(
+            f"{self.library}: error: {self.clean_message(reason)}; {self.clean_message(message)} <<{key}>>"
+        )
     
     def warn(self, reason, message, key):
-        print("%s: warning: %s; %s <<%s>>"%(
-            self.library,
-            self.clean_message(reason),
-            self.clean_message(message),
-            key,
-            ))
+        print(
+            f"{self.library}: warning: {self.clean_message(reason)}; {self.clean_message(message)} <<{key}>>"
+        )
     
     def info(self, message):
         if self.debug:
-            print("%s: info: %s"%(self.library, self.clean_message(message)))
+            print(f"{self.library}: info: {self.clean_message(message)}")
     
     def clean_message(self, message):
         return " ".join(message.strip().split())
@@ -234,10 +235,9 @@ class check_library():
             if negate:
                 self.error("directory found", message, key)
                 return False
-        else:
-            if not negate:
-                self.error("directory not found", message, key)
-                return False
+        elif not negate:
+            self.error("directory not found", message, key)
+            return False
         return True
     
     def warn_dir_exists(self, dir, message, key, negate = False):
@@ -246,10 +246,9 @@ class check_library():
             if negate:
                 self.warn("directory found", message, key)
                 return False
-        else:
-            if not negate:
-                self.warn("directory not found", message, key)
-                return False
+        elif not negate:
+            self.warn("directory not found", message, key)
+            return False
         return True
     
     def assert_file_exists(self, dir, globs_to_include, message, key, negate = False, globs_to_exclude = []):
@@ -258,10 +257,9 @@ class check_library():
             if found:
                 self.error("file found", message, key)
                 return False
-        else:
-            if not found:
-                self.error("file not found", message, key)
-                return False
+        elif not found:
+            self.error("file not found", message, key)
+            return False
         return True
     
     def warn_file_exists(self, dir, globs_to_include, message, key, negate = False, globs_to_exclude = []):
@@ -270,10 +268,9 @@ class check_library():
             if found:
                 self.warn("file found", message, key)
                 return False
-        else:
-            if not found:
-                self.warn("file not found", message, key)
-                return False
+        elif not found:
+            self.warn("file not found", message, key)
+            return False
         return True
     
     def test_dir_exists(self, dir):
